@@ -1,27 +1,30 @@
 from flask import Flask, render_template, request, redirect, flash
-import sqlite3
+import psycopg2
 import stripe
 import os
 from markupsafe import escape
 
 app = Flask(__name__)
+app.secret_key = "your_secret_key"  # nécessaire pour flash messages
 
-# Clé secrète pour activer les flash messages
-app.secret_key = "une_cle_secrete_pour_flash"  # Change-la pour plus de sécurité
-
-# Stripe secret key depuis variable d'environnement Render
+# Stripe secret key from Render environment variable
 stripe.api_key = os.environ.get("STRIPE_SECRET_KEY")
 
-# Connexion à la base SQLite
+# PostgreSQL connection
 def get_db():
-    return sqlite3.connect("credit_repair.db")
+    conn = psycopg2.connect(
+        host="dpg-d52sqkv5r7bs73dv7ls0-a.render.com",
+        database="credit_repair_db",
+        user="credit_repair_db_user",
+        password="uj6uFsrJMsVmVNxkUKIbcoliafJtdJuQ",
+        port=5432
+    )
+    return conn
 
-# Page d'accueil
 @app.route("/")
 def home():
     return render_template("index.html")
 
-# Route pour Free Consultation
 @app.route("/consultation", methods=["POST"])
 def consultation():
     name = escape(request.form["name"])
@@ -34,17 +37,15 @@ def consultation():
 
     cursor.execute("""
         INSERT INTO clients (full_name, email, phone, message)
-        VALUES (?, ?, ?, ?)
+        VALUES (%s, %s, %s, %s)
     """, (name, email, phone, message))
 
     conn.commit()
     conn.close()
 
-    # Flash message de confirmation
-    flash("✅ Merci ! Votre demande de consultation a été envoyée avec succès.")
+    flash("✅ Merci ! Votre demande de consultation a été reçue. Nous vous contacterons bientôt.")
     return redirect("/")
 
-# Route pour Stripe Checkout
 @app.route("/create-checkout-session", methods=["POST"])
 def create_checkout():
     session = stripe.checkout.Session.create(
@@ -63,7 +64,6 @@ def create_checkout():
     )
     return redirect(session.url, code=303)
 
-# Page succès paiement
 @app.route("/success")
 def success():
     return "<h1>Payment Successful! Thank you.</h1>"
