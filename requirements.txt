@@ -1,5 +1,9 @@
 Flask==3.1.2
 stripe==14.1.0
+<<<<<<< HEAD
 gunicorn
 markupsafe
 psycopg2-binary
+=======
+gunicorn
+>>>>>>> 06bcf04 (Prepare for rebase: update requirements.txt and add app.py)
