@@ -127,6 +127,18 @@ button {
     border-radius: 6px;
 }
 
+/* ===== Flash Message ===== */
+.flash-message {
+    max-width: 500px;
+    margin: 20px auto;
+    padding: 10px;
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    border-radius: 5px;
+    text-align: center;
+}
+
 /* ===== CTA ===== */
 .cta {
     text-align: center;
@@ -155,6 +167,17 @@ footer {
 </head>
 
 <body>
+
+<!-- ===== Flash Message ===== -->
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div class="flash-message">
+      {% for message in messages %}
+        <p>{{ message }}</p>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
 
 <!-- ===== Header Hero ===== -->
 <header>
