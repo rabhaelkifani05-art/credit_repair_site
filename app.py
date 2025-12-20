@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, flash
 import sqlite3
 import stripe
 import os
@@ -6,16 +6,22 @@ from markupsafe import escape
 
 app = Flask(__name__)
 
-# Stripe secret key from Render environment variable
+# Clé secrète pour activer les flash messages
+app.secret_key = "une_cle_secrete_pour_flash"  # Change-la pour plus de sécurité
+
+# Stripe secret key depuis variable d'environnement Render
 stripe.api_key = os.environ.get("STRIPE_SECRET_KEY")
 
+# Connexion à la base SQLite
 def get_db():
     return sqlite3.connect("credit_repair.db")
 
+# Page d'accueil
 @app.route("/")
 def home():
     return render_template("index.html")
 
+# Route pour Free Consultation
 @app.route("/consultation", methods=["POST"])
 def consultation():
     name = escape(request.form["name"])
@@ -33,8 +39,12 @@ def consultation():
 
     conn.commit()
     conn.close()
+
+    # Flash message de confirmation
+    flash("✅ Merci ! Votre demande de consultation a été envoyée avec succès.")
     return redirect("/")
 
+# Route pour Stripe Checkout
 @app.route("/create-checkout-session", methods=["POST"])
 def create_checkout():
     session = stripe.checkout.Session.create(
@@ -53,6 +63,7 @@ def create_checkout():
     )
     return redirect(session.url, code=303)
 
+# Page succès paiement
 @app.route("/success")
 def success():
     return "<h1>Payment Successful! Thank you.</h1>"
