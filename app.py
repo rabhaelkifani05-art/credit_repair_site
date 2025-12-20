@@ -1,38 +1,25 @@
-<<<<<<< HEAD
 from flask import Flask, render_template, request, redirect, flash
 import psycopg2
-=======
-from flask import Flask, render_template, request, redirect
-import sqlite3
->>>>>>> 06bcf04 (Prepare for rebase: update requirements.txt and add app.py)
 import stripe
 import os
 from markupsafe import escape
 
 app = Flask(__name__)
-<<<<<<< HEAD
 app.secret_key = "your_secret_key"  # nécessaire pour flash messages
-=======
->>>>>>> 06bcf04 (Prepare for rebase: update requirements.txt and add app.py)
 
 # Stripe secret key from Render environment variable
 stripe.api_key = os.environ.get("STRIPE_SECRET_KEY")
 
-<<<<<<< HEAD
 # PostgreSQL connection
 def get_db():
     conn = psycopg2.connect(
-        host="dpg-d52sqkv5r7bs73dv7ls0-a.render.com",
+        host="dpg-d52sqkv5r7bs73dv7ls0-a.oregon-postgres.render.com",
         database="credit_repair_db",
         user="credit_repair_db_user",
         password="uj6uFsrJMsVmVNxkUKIbcoliafJtdJuQ",
         port=5432
     )
     return conn
-=======
-def get_db():
-    return sqlite3.connect("credit_repair.db")
->>>>>>> 06bcf04 (Prepare for rebase: update requirements.txt and add app.py)
 
 @app.route("/")
 def home():
@@ -50,20 +37,13 @@ def consultation():
 
     cursor.execute("""
         INSERT INTO clients (full_name, email, phone, message)
-<<<<<<< HEAD
         VALUES (%s, %s, %s, %s)
-=======
-        VALUES (?, ?, ?, ?)
->>>>>>> 06bcf04 (Prepare for rebase: update requirements.txt and add app.py)
     """, (name, email, phone, message))
 
     conn.commit()
     conn.close()
-<<<<<<< HEAD
 
     flash("✅ Merci ! Votre demande de consultation a été reçue. Nous vous contacterons bientôt.")
-=======
->>>>>>> 06bcf04 (Prepare for rebase: update requirements.txt and add app.py)
     return redirect("/")
 
 @app.route("/create-checkout-session", methods=["POST"])
